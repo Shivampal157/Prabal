@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PRABAL — Indian Army Predictive Logistics System</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="extras.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+</head>
+<body class="login-page">
+
+  <!-- LOGIN PAGE -->
+  <div id="loginScreen" class="login-wrapper">
+    <div class="login-left">
+      <div class="login-logo-area">
+        <div class="army-emblem">🪖</div>
+        <h1 class="prabal-title">PRABAL</h1>
+        <p class="prabal-full">Predictive Real-time Army Base Asset Logistics</p>
+      </div>
+      <div class="login-tagline">
+        <p>"Right Supply. Right Time. Right Place."</p>
+        <span>Indian Army — Forward Supply Chain Intelligence System</span>
+      </div>
+      <div class="login-features">
+        <div class="lf-item"><span>📡</span> IoT Real-time Tracking</div>
+        <div class="lf-item"><span>🧠</span> AI Demand Forecasting</div>
+        <div class="lf-item"><span>🗺️</span> GIS Route Optimization</div>
+        <div class="lf-item"><span>📶</span> Offline Edge Mode</div>
+      </div>
+    </div>
+    <div class="login-right">
+      <div class="login-card">
+        <div class="login-card-top">
+          <div class="badge-secure">🔒 SECURE LOGIN — AFNET</div>
+          <h2>Commander Access</h2>
+          <p>Ministry of Defence — Defence Services Staff College</p>
+        </div>
+        <form id="loginForm">
+          <div class="input-group">
+            <label>Service Number</label>
+            <input type="text" id="serviceNum" placeholder="e.g. IC-12345" required/>
+          </div>
+          <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter secure password" required/>
+          </div>
+          <div class="input-group">
+            <label>Formation</label>
+            <select id="formation">
+              <option>Northern Command — Udhampur</option>
+              <option>Eastern Command — Kolkata</option>
+              <option>Western Command — Chandimandir</option>
+              <option>Southern Command — Pune</option>
+              <option>Central Command — Lucknow</option>
+            </select>
+          </div>
+      <button type="submit" class="login-btn" id="loginBtn">
+            <span id="loginBtnText">Access PRABAL Dashboard</span>
+            <span id="loginBtnArrow">→</span>
+          </button>
+          <div class="login-divider"><span>or continue as</span></div>
+          <button type="button" class="demo-btn" onclick="demoLogin()">👁️ Demo Mode — Observer Access</button>
+          <p class="login-note">⚠️ Authorised personnel only. All access is logged on AFNET.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="mainApp" class="hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <span class="sl-icon">🪖</span>
+        <div>
+          <div class="sl-title">PRABAL</div>
+          <div class="sl-sub">Army Logistics AI</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" onclick="showPage('dashboard')">
+          <span>📊</span> Dashboard
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('forecast')">
+          <span>🧠</span> AI Demand Forecast
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('routes')">
+          <span>🗺️</span> Route Optimizer
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('inventory')">
+          <span>📦</span> Inventory Tracker
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('alerts')">
+          <span>🚨</span> Alert Center
+          <span class="alert-badge" id="alertCount">3</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('timeline')">
+          <span>⏱️</span> 36-Hr Timeline
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('aiassist')">
+          <span>💬</span> AI Assistant
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sf-user">
+          <div class="sf-avatar">🪖</div>
+          <div>
+            <div class="sf-name" id="loggedUser">Col. R. Sharma</div>
+            <div class="sf-rank" id="loggedFormation">Northern Command</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="downloadReport()" class="logout-btn" style="color:#60A5FA;border-color:rgba(37,99,235,0.3);background:rgba(37,99,235,0.1)">📄 Report</button>
+          <button onclick="logout()" class="logout-btn">Logout</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- TOP BAR -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+          <div class="page-title" id="pageTitle">Dashboard Overview</div>
+        </div>
+        <div class="topbar-right">
+          <div class="iot-status" id="iotStatus">
+            <span class="dot green"></span> <span id="iotText">IoT Live</span>
+          </div>
+          <div class="weather-widget" id="weatherWidget">
+            <span>☁️</span> <span id="weatherText">Loading...</span>
+          </div>
+          <div class="offline-badge" id="offlineBadge">
+            <span class="dot green"></span> AFNET Online
+          </div>
+          <div class="time-display" id="timeDisplay"></div>
+        </div>
+      </div>
+
+      <!-- PAGES -->
+
+      <!-- DASHBOARD PAGE -->
+      <div class="page active" id="page-dashboard">
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon blue">📦</div>
+            <div class="kpi-data">
+              <div class="kpi-num" data-target="4280">0</div>
+              <div class="kpi-label">Total Assets Tracked</div>
+            </div>
+            <div class="kpi-trend up">↑ 12% this week</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon green">✅</div>
+            <div class="kpi-data">
+              <div class="kpi-num" data-target="94">0</div>
+              <div class="kpi-label">Forecast Accuracy %</div>
+            </div>
+            <div class="kpi-trend up">↑ 34% vs manual</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon orange">🚚</div>
+            <div class="kpi-data">
+              <div class="kpi-num" data-target="28">0</div>
+              <div class="kpi-label">Active Supply Routes</div>
+            </div>
+            <div class="kpi-trend up">↑ 3 new today</div>
+          </div>
+          <div class="kpi-card alert-card">
+            <div class="kpi-icon red">🚨</div>
+            <div class="kpi-data">
+              <div class="kpi-num" data-target="3">0</div>
+              <div class="kpi-label">Critical Alerts</div>
+            </div>
+            <div class="kpi-trend down">↓ 2 resolved today</div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row">
+          <div class="chart-card wide">
+            <div class="chart-header">
+              <div>
+                <h3>Supply Demand Forecast — Next 30 Days</h3>
+                <p>LSTM model predictions vs actual consumption</p>
+              </div>
+              <select class="chart-filter" onchange="updateForecastChart(this.value)">
+                <option value="fuel">Fuel & Lubricants</option>
+                <option value="ammo">Ammunition</option>
+                <option value="ration">Rations</option>
+                <option value="medicine">Medical Supplies</option>
+              </select>
+            </div>
+            <canvas id="forecastChart" height="100"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>Supply Category Status</h3>
+            </div>
+            <canvas id="categoryChart" height="180"></canvas>
+          </div>
+        </div>
+
+        <!-- Posts & Activity Row -->
+        <div class="bottom-row">
+          <div class="posts-table-card">
+            <div class="card-header">
+              <h3>Forward Post Status</h3>
+              <span class="live-badge">● LIVE</span>
+            </div>
+            <table class="posts-table">
+              <thead>
+                <tr>
+                  <th>Post Name</th>
+                  <th>Location</th>
+                  <th>Fuel</th>
+                  <th>Ration</th>
+                  <th>Medicine</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="postsTableBody">
+              </tbody>
+            </table>
+          </div>
+          <div class="activity-card">
+            <div class="card-header">
+              <h3>Recent Activity</h3>
+            </div>
+            <div class="activity-list" id="activityList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORECAST PAGE -->
+      <div class="page" id="page-forecast">
+        <div class="page-intro">
+          <h2>AI Demand Forecast Engine</h2>
+          <p>LSTM neural network predicts supply requirements 30 days in advance with 94% accuracy</p>
+        </div>
+
+        <div class="forecast-controls">
+          <select id="fcPost" class="fc-select">
+            <option>Siachen Base Camp — Post Alpha</option>
+            <option>Daulat Beg Oldi — Post Bravo</option>
+            <option>Kargil Sector — Post Charlie</option>
+            <option>Turtuk — Post Delta</option>
+          </select>
+          <select id="fcCategory" class="fc-select">
+            <option>Fuel & Lubricants (FOL)</option>
+            <option>Ammunition</option>
+            <option>Rations</option>
+            <option>Medical Supplies</option>
+            <option>Spare Parts</option>
+          </select>
+          <button class="btn-primary" onclick="runForecast()">🧠 Run AI Forecast</button>
+        </div>
+
+        <div class="forecast-result" id="forecastResult">
+          <div class="fc-stat-row">
+            <div class="fc-stat">
+              <div class="fc-s-num" id="fc30day">—</div>
+              <div class="fc-s-label">30-Day Requirement</div>
+            </div>
+            <div class="fc-stat">
+              <div class="fc-s-num" id="fcAccuracy">—</div>
+              <div class="fc-s-label">Model Confidence</div>
+            </div>
+            <div class="fc-stat">
+              <div class="fc-s-num" id="fcStatus">—</div>
+              <div class="fc-s-label">Supply Status</div>
+            </div>
+            <div class="fc-stat">
+              <div class="fc-s-num" id="fcReorder">—</div>
+              <div class="fc-s-label">Reorder In</div>
+            </div>
+          </div>
+          <canvas id="fcDetailChart" height="80"></canvas>
+
+          <!-- AI Insight Box -->
+          <div class="ai-insight-box" id="aiInsightBox">
+            <div class="ai-insight-header">🧠 PRABAL AI Analysis</div>
+            <div id="aiInsightText">Click "Run AI Forecast" to get predictions...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROUTES PAGE -->
+      <div class="page" id="page-routes">
+        <div class="page-intro">
+          <h2>GIS Route Optimizer</h2>
+          <p>Real-time terrain, weather and road condition analysis for optimal supply routes</p>
+        </div>
+        <div class="route-layout">
+          <div class="route-controls">
+            <div class="rc-section">
+              <label>Origin Depot</label>
+              <select id="routeFrom" class="fc-select">
+                <option>Jammu Supply Depot</option>
+                <option>Srinagar Base</option>
+                <option>Leh Main Depot</option>
+                <option>Chandigarh Depot</option>
+              </select>
+            </div>
+            <div class="rc-section">
+              <label>Forward Post</label>
+              <select id="routeTo" class="fc-select">
+                <option>Siachen Base Camp</option>
+                <option>Daulat Beg Oldi</option>
+                <option>Kargil Post</option>
+                <option>Turtuk Post</option>
+              </select>
+            </div>
+            <div class="rc-section">
+              <label>Supply Type</label>
+              <select class="fc-select">
+                <option>Fuel Tanker</option>
+                <option>Ration Convoy</option>
+                <option>Medical Emergency</option>
+                <option>Ammunition</option>
+              </select>
+            </div>
+            <button class="btn-primary" onclick="optimizeRoute()">🗺️ Optimize Route</button>
+
+            <div class="route-result" id="routeResult" style="display:none">
+              <div class="rr-item">
+                <span>📍 Distance</span>
+                <span id="rDistance">—</span>
+              </div>
+              <div class="rr-item">
+                <span>⏱️ Est. Time</span>
+                <span id="rTime">—</span>
+              </div>
+              <div class="rr-item">
+                <span>⛰️ Terrain</span>
+                <span id="rTerrain">—</span>
+              </div>
+              <div class="rr-item">
+                <span>☁️ Weather</span>
+                <span id="rWeather">—</span>
+              </div>
+              <div class="route-status-badge" id="rStatus">—</div>
+            </div>
+          </div>
+          <div id="map" class="map-container"></div>
+        </div>
+      </div>
+
+      <!-- INVENTORY PAGE -->
+      <div class="page" id="page-inventory">
+        <div class="page-intro">
+          <h2>Real-time Inventory Tracker</h2>
+          <p>IoT-based tracking — RFID/GPS enabled asset visibility across all forward posts</p>
+        </div>
+        <div class="inv-controls">
+          <input type="text" id="invSearch" class="inv-search" placeholder="🔍 Search post or supply category..." oninput="filterInventory()"/>
+          <select class="fc-select" onchange="filterInventory()">
+            <option>All Categories</option>
+            <option>Fuel & Lubricants</option>
+            <option>Ammunition</option>
+            <option>Rations</option>
+            <option>Medical</option>
+          </select>
+        </div>
+        <div class="inv-grid" id="invGrid"></div>
+      </div>
+
+      <!-- ALERTS PAGE -->
+      <div class="page" id="page-alerts">
+        <div class="page-intro">
+          <h2>Alert Center</h2>
+          <p>Predictive shortage alerts and supply chain risk notifications</p>
+        </div>
+        <div class="alerts-list" id="alertsList"></div>
+      </div>
+
+      <!-- TIMELINE PAGE -->
+      <div class="page" id="page-timeline">
+        <div class="page-intro">
+          <h2>36-Hour Hackathon Build Timeline</h2>
+          <p>SIH 2026 Grand Finale — PRABAL development milestones</p>
+        </div>
+        <div class="timeline-wrapper" id="timelineWrapper"></div>
+      </div>
+
+      <!-- AI ASSISTANT PAGE -->
+      <div class="page" id="page-aiassist">
+        <div class="page-intro">
+          <h2>PRABAL AI Assistant</h2>
+          <p>Ask anything about supply chain, forecasts, or routes</p>
+        </div>
+        <div class="chat-wrapper">
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg bot">
+              <div class="cm-avatar">🪖</div>
+              <div class="cm-bubble">
+                Jai Hind! I am PRABAL AI Assistant. Ask me about supply status, demand forecasts, route suggestions, or any logistics query for your formation.
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Ask PRABAL AI... e.g. What is fuel status at Siachen?" onkeydown="if(event.key==='Enter') sendChat()"/>
+            <button class="btn-primary" onclick="sendChat()">Send →</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script src="extras.js"></script>
+</body>
+</html>
